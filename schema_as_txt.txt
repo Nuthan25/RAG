@@ -1,0 +1,146 @@
+Following are the Nodes Label:
+`Sales Partner`,
+`Sales Order`,
+`Work Order`,
+`Customer`,
+`Part`,
+`Value Stream`,
+`Company`,
+`Shipment Provider`,
+`Quote`.
+
+Following are the Edges Label:
+`requests quote`,
+`services`,
+`employees`,
+`measured by`,
+`creates`,
+`associated to`,
+`contains`,
+`results to`,
+`produces`,
+`delivers to`,
+`ships to`,
+`converted to`,
+`places`,
+`send to`.
+
+Following are the Node Name:
+Node Name of `Sales Partner` is `Sales Partner`,
+Node Name of `Sales Order` is `Sales Order`,
+Node Name of `Work Order` is `Work Order`,
+Node Name of `Customer` is `Customer`,
+Node Name of `Part` is `Part`,
+Node Name of `Value Stream` is `Value Stream`,
+Node Name of `Company` is `Company`,
+Node Name of `Shipment Provider` is `Shipment Provider`,
+Node Name of `Quote` is `Quote`.
+
+Relationships are defined as follows:
+Node `Customer` is connected to Node `Sales Partner` via Edge `requests quote`,
+Node `Company` is connected to Node `Customer` via Edge `services`,
+Node `Company` is connected to Node `Sales Partner` via Edge `employees`,
+Node `Company` is connected to Node `Value Stream` via Edge measured by,
+Node `Sales Partner` is connected to Node `Quote` via Edge `creates`,
+Node `Value Stream` is connected to Node `Sales Order` via Edge `associated to`,
+Node `Sales Order` is connected to Node `Part` via Edge `contains`,
+Node `Sales Order` is connected to Node `Work Order` via Edge `results to`,
+Node `Work Order` is connected to Node `Part` via Edge `produces`,
+Node `Work Order` is connected to Node `Shipment Provider` via Edge `delivers to`,
+Node `Shipment Provider` is connected to Node `Customer` via Edge `ships to`,
+Node `Quote` is connected to Node `Sales Order` via Edge `converted to`,
+Node `Customer` is connected to Node `Sales Order` via Edge `places`,
+Node `Quote` is connected to Node `Customer` via Edge `send to`.
+
+Properties for Node `Sales Partner` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING.
+
+Properties for Node `Sales Order` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+terms as type STRING,
+fai_req as type STRING,
+po as type STRING,
+ready_to_invoice as type STRING,
+terms_description as type STRING,
+order_date as type DATE,
+sales_cat as type STRING,
+need_by as type STRING.
+
+Properties for Node `Work Order` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+job_ship_qty as type INTEGER,
+line as type STRING,
+ship_month as type STRING,
+order_line as type STRING,
+value_stream as type STRING,
+unit_price as type FLOAT,
+order_rel as type STRING,
+pack_ots_state as type STRING,
+market__description as type STRING,
+job_analysis_code as type STRING,
+tracking_number as type STRING,
+job as type STRING,
+revenue as type FLOAT,
+lateshipments as type STRING,
+program as type STRING,
+commit_date_line as type STRING,
+ship_date as type DATE,
+commit_date_rel as type STRING,
+use_ots as type STRING,
+relative_ship_by as type STRING,
+ship_year as type STRING,
+need_by as type STRING.
+
+Properties for Node `Customer` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+customer_id as type INTEGER,
+state_prov as type STRING.
+
+Properties for Node `Part` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+part_description as type STRING,
+inventory_ship_qty as type STRING,
+make_or_buy as type STRING.
+
+Properties for Node `Value Stream` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+program as type STRING,
+application as type STRING.
+
+Properties for Node `Company` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING.
+
+Properties for Node `Shipment Provider` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+pack_ots_state as type STRING,
+use_ots as type STRING,
+pack_line as type STRING,
+packing_slip as type STRING.
+
+Properties for Node `Quote` are:
+$$creationDate$$ as type STRING,
+$$Name$$ as type STRING,
+
+Important Note:
+JOB ID:always include job_id = value in WHERE clause,
+ROUND: always use round like this.Example toString(round(sum(wo.revenue))),
+VALUE STREAM:value stream should always taken as Node propertie of `Work Order` Node, not from the `Value Stream` Node itself,
+LICENSE PROGRAM:progem should always taken as Node propertie od `Work Order` Node.
+DATE:date should be taken from node `Work Order`,`ship_date`, If required then create a relationship with node `Work Order`, When ever you useing of datetime, use datetime('2023-01-01T00:00:00'), but don't use datetime(w.`ship_date`), ensure that datetime conditions always include both a starting and an ending time in the WHERE clause. The datetime comparison should use this format: AND wo.`ship_date` >= datetime('YYYY-MM-DDTHH:MM:SS') AND wo.`ship_date` < datetime('YYYY-MM-DDTHH:MM:SS')
+REVENUE:Revenue is the total money a company earns from sales before subtracting costs. Always take revenue from node `Work Order`, If required then create a relationship with node `Work Order`,
+CALIBRATION JOBS:Calibration jobs ensure measuring equipment is accurate and meets required standards Always take calibration from Node `Part`, `part_description` and always take part_description in toLower(), create a relation as 'Node `Customer` is connected to Node `Sales Order` via Edge `places`,Node `Sales Order` is connected to Node `Work Order` via Edge `results to`, Node `Work Order` is connected to Node `Part` via Edge `produces`',do not use COUNT(CASE ) for calibration.
+TIRE CAGE PARTS:tire cage is a Node property value of Node Property `part_description` in Node `Part`, so create relation that 'Node `Work Order` is connected to Node `Part` via Edge `produces`',
+SALES PARTNER:sales partner should have a relationship like "Node `Sales Partner` is connected to Node `Quote` via Edge `creates`,Node `Quote` is connected to Node `Sales Order` via Edge `converted to`, Node `Sales Order` is connected to Node `Work Order` via Edge `results to`,"
+JOB_ID:always add $$ID$$ = "$$VALUE$$" in WHERE clause.
+BACKTIC:always add ` ` Backtic to Node Label and Edge Label, Example: (w.`Work Order`),[:`result to`], don't add backtick to $$ID$$.
+PERCENT:Ensure that when calculating percentages, both the numerator (specific condition count) and denominator (total count) are computed within the same MATCH statement, use COUNT(CASE WHEN ...) for selective counting of specific conditions without limiting the overall result set. Avoid using the WHERE clause to filter unless it's part of the query logic, and never use SQL-style subqueries (SELECT count(aliase)). Always calculate totals and specific condition counts in a single MATCH statement and use toFloat() when calculating percentages, ensure that conditions for counting specific subsets (e.g., job_ship_qty < 6 and job_ship_qty = 1, etc) are placed inside CASE statements for conditional aggregation and when counting for total_jobs use w.Examle: COUNT(W),
+TOLOWER:For properties like market__description and part_description only use string functions like toLower(). Example: toLower(w.`market__description`) 
+CONDITION:Always use 'mil' instead of 'military' while using CONTAINS.
